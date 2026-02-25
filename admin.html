@@ -201,7 +201,22 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Password Gate -->
+    <div id="password-gate" style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+        <div style="background: rgba(255,255,255,0.08); padding: 40px; border-radius: 20px; text-align: center; max-width: 350px;">
+            <div style="font-size: 48px; margin-bottom: 20px;">🔐</div>
+            <h2 style="color: #ffd700; margin-bottom: 20px;">Admin Access</h2>
+            <input type="password" id="admin-password" placeholder="Enter password" 
+                style="width: 100%; padding: 14px; border: 2px solid rgba(255,255,255,0.1); border-radius: 12px; background: rgba(255,255,255,0.05); color: #fff; font-size: 1rem; margin-bottom: 16px;">
+            <button onclick="checkPassword()" 
+                style="width: 100%; padding: 14px; background: linear-gradient(90deg, #ffd700, #ffb347); border: none; border-radius: 12px; color: #1a1a2e; font-weight: 600; cursor: pointer;">
+                Enter
+            </button>
+            <p id="password-error" style="color: #f87171; margin-top: 12px; display: none;">Wrong password</p>
+        </div>
+    </div>
+
+    <div class="container" id="admin-content" style="display: none;">
         <div class="header">
             <h1>🌙 Admin Panel</h1>
             <a href="index.html" class="back-link">← Back to RSVP</a>
@@ -238,6 +253,31 @@
     <script>
         // Config - same as main app
         const USE_LOCAL_STORAGE = true;
+        
+        // Admin password - change this!
+        const ADMIN_PASSWORD = 'iftar2026';
+        
+        function checkPassword() {
+            const input = document.getElementById('admin-password').value;
+            if (input === ADMIN_PASSWORD) {
+                document.getElementById('password-gate').style.display = 'none';
+                document.getElementById('admin-content').style.display = 'block';
+                sessionStorage.setItem('admin_auth', 'true');
+            } else {
+                document.getElementById('password-error').style.display = 'block';
+            }
+        }
+        
+        // Check if already authenticated this session
+        if (sessionStorage.getItem('admin_auth') === 'true') {
+            document.getElementById('password-gate').style.display = 'none';
+            document.getElementById('admin-content').style.display = 'block';
+        }
+        
+        // Allow Enter key to submit
+        document.getElementById('admin-password')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkPassword();
+        });
 
         function loadResponses() {
             let guests = [];

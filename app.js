@@ -4,8 +4,8 @@
 // ============================================
 // SUPABASE CONFIG - Update these!
 // ============================================
-const SUPABASE_URL = 'https://your-project.supabase.co';
-const SUPABASE_ANON_KEY = 'your-anon-key';
+const SUPABASE_URL = 'https://modyrxaskcdrnojgqpcq.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vZHlyeGFza2Nkcm5vamdxcGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNDQ1NzAsImV4cCI6MjA4NzYyMDU3MH0.WZMt3OvzcrYloNop6OA1zG4S6zGjrEOBVVSqybXhUPU';
 
 // ============================================
 // Initialize Supabase

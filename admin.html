@@ -256,14 +256,12 @@
         const SUPABASE_URL = 'https://modyrxaskcdrnojgqpcq.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vZHlyeGFza2Nkcm5vamdxcGNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNDQ1NzAsImV4cCI6MjA4NzYyMDU3MH0.WZMt3OvzcrYloNop6OA1zG4S6zGjrEOBVVSqybXhUPU';
         
-        let supabase = null;
+        let supabaseClient = null;
         let dbReady = false;
         
         // Initialize Supabase
-        if (typeof window.supabaseClient !== 'undefined') {
-            supabase = window.supabaseClient;
-        } else if (SUPABASE_URL !== 'https://your-project.supabase.co') {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        if (typeof window.supabase !== 'undefined' && SUPABASE_URL !== 'https://your-project.supabase.co') {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             dbReady = true;
         }
         
@@ -295,8 +293,8 @@
         async function loadResponses() {
             let guests = [];
             
-            if (dbReady && supabase) {
-                const { data, error } = await supabase
+            if (dbReady && supabaseClient) {
+                const { data, error } = await supabaseClient
                     .from('rsvps')
                     .select('*')
                     .order('created_at', { ascending: false });
@@ -351,8 +349,8 @@
         async function deleteGuest(id) {
             if (!confirm('Remove this response?')) return;
             
-            if (dbReady && supabase) {
-                await supabase.from('rsvps').delete().eq('id', id);
+            if (dbReady && supabaseClient) {
+                await supabaseClient.from('rsvps').delete().eq('id', id);
             } else {
                 let guests = JSON.parse(localStorage.getItem('iftar_guests') || '[]');
                 guests = guests.filter(g => g.id !== id);
@@ -364,8 +362,8 @@
         async function clearAll() {
             if (!confirm('Are you sure you want to clear ALL responses? This cannot be undone.')) return;
             
-            if (dbReady && supabase) {
-                await supabase.from('rsvps').delete().neq('id', 0);
+            if (dbReady && supabaseClient) {
+                await supabaseClient.from('rsvps').delete().neq('id', 0);
             } else {
                 localStorage.removeItem('iftar_guests');
             }
@@ -374,8 +372,8 @@
         
         async function exportCSV() {
             let guests = [];
-            if (dbReady && supabase) {
-                const { data } = await supabase.from('rsvps').select('*').order('created_at', { ascending: true });
+            if (dbReady && supabaseClient) {
+                const { data } = await supabaseClient.from('rsvps').select('*').order('created_at', { ascending: true });
                 guests = data || [];
             } else {
                 guests = JSON.parse(localStorage.getItem('iftar_guests') || '[]');

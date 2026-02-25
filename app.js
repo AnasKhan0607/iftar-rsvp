@@ -10,12 +10,12 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // ============================================
 // Initialize Supabase
 // ============================================
-let supabase = null;
+let supabaseClient = null;
 let dbReady = false;
 
 function initSupabase() {
     if (typeof window.supabase !== 'undefined' && SUPABASE_URL !== 'https://your-project.supabase.co') {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         dbReady = true;
         console.log('Supabase connected!');
         loadGuests();
@@ -106,8 +106,8 @@ function updateSubmitButton() {
 // Data Functions
 // ============================================
 async function saveRSVP(name, attending) {
-    if (dbReady && supabase) {
-        const { error } = await supabase
+    if (dbReady && supabaseClient) {
+        const { error } = await supabaseClient
             .from('rsvps')
             .insert([{ name, attending }]);
         
@@ -128,8 +128,8 @@ async function saveRSVP(name, attending) {
 async function loadGuests() {
     let guests = [];
     
-    if (dbReady && supabase) {
-        const { data, error } = await supabase
+    if (dbReady && supabaseClient) {
+        const { data, error } = await supabaseClient
             .from('rsvps')
             .select('*')
             .order('created_at', { ascending: true });
@@ -179,5 +179,5 @@ function escapeHtml(text) {
 
 // Export for admin page
 window.loadGuests = loadGuests;
-window.supabaseClient = () => supabase;
+window.getSupabaseClient = () => supabaseClient;
 window.isDbReady = () => dbReady;

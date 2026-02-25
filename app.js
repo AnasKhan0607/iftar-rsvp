@@ -2,31 +2,35 @@
 // Uses Supabase for backend storage
 
 // ============================================
-// CONFIGURATION - Update with your Supabase credentials
+// SUPABASE CONFIG - Update these!
 // ============================================
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-
-// For demo/testing without Supabase, set this to true
-const USE_LOCAL_STORAGE = true;
+const SUPABASE_URL = 'https://your-project.supabase.co';
+const SUPABASE_ANON_KEY = 'your-anon-key';
 
 // ============================================
-// Initialize
+// Initialize Supabase
 // ============================================
 let supabase = null;
+let dbReady = false;
 
-if (!USE_LOCAL_STORAGE && SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
-    // Load Supabase client dynamically
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-    script.onload = () => {
+function initSupabase() {
+    if (typeof window.supabase !== 'undefined' && SUPABASE_URL !== 'https://your-project.supabase.co') {
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        dbReady = true;
+        console.log('Supabase connected!');
         loadGuests();
-    };
-    document.head.appendChild(script);
+    } else if (SUPABASE_URL === 'https://your-project.supabase.co') {
+        console.warn('Supabase not configured - using localStorage fallback');
+        dbReady = false;
+        loadGuests();
+    }
+}
+
+// Wait for Supabase SDK to load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSupabase);
 } else {
-    // Use localStorage for demo
-    document.addEventListener('DOMContentLoaded', loadGuests);
+    initSupabase();
 }
 
 // ============================================
@@ -44,53 +48,55 @@ const attendanceBtns = document.querySelectorAll('.attendance-btn');
 // ============================================
 // Event Listeners
 // ============================================
-attendanceBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        // Remove selected from all buttons
-        attendanceBtns.forEach(b => b.classList.remove('selected'));
-        // Add selected to clicked button
-        btn.classList.add('selected');
-        // Set hidden input value
-        attendingInput.value = btn.dataset.value;
-        // Enable submit button
-        updateSubmitButton();
+if (attendanceBtns) {
+    attendanceBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            attendanceBtns.forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            attendingInput.value = btn.dataset.value;
+            updateSubmitButton();
+        });
     });
-});
+}
 
-nameInput.addEventListener('input', updateSubmitButton);
+if (nameInput) {
+    nameInput.addEventListener('input', updateSubmitButton);
+}
 
-form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const name = nameInput.value.trim();
-    const attending = attendingInput.value === 'yes';
-    
-    if (!name || !attendingInput.value) return;
-    
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Submitting...';
-    
-    try {
-        await saveRSVP(name, attending);
+if (form) {
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
         
-        // Show success message
-        form.style.display = 'none';
-        successMessage.classList.add('show');
+        const name = nameInput.value.trim();
+        const attending = attendingInput.value === 'yes';
         
-        // Update guest list
-        loadGuests();
-    } catch (error) {
-        console.error('Error saving RSVP:', error);
-        alert('Something went wrong. Please try again.');
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit RSVP';
-    }
-});
+        if (!name || !attendingInput.value) return;
+        
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+        
+        try {
+            await saveRSVP(name, attending);
+            form.style.display = 'none';
+            successMessage.classList.add('show');
+            if (!attending) {
+                successMessage.querySelector('.success-subtext').textContent = 'Maybe next time insha\'Allah 🤲';
+            }
+            loadGuests();
+        } catch (error) {
+            console.error('Error saving RSVP:', error);
+            alert('Something went wrong. Please try again.');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit RSVP';
+        }
+    });
+}
 
 // ============================================
 // Helper Functions
 // ============================================
 function updateSubmitButton() {
+    if (!submitBtn) return;
     const hasName = nameInput.value.trim().length > 0;
     const hasAttendance = attendingInput.value !== '';
     submitBtn.disabled = !(hasName && hasAttendance);
@@ -100,8 +106,14 @@ function updateSubmitButton() {
 // Data Functions
 // ============================================
 async function saveRSVP(name, attending) {
-    if (USE_LOCAL_STORAGE || !supabase) {
-        // Use localStorage
+    if (dbReady && supabase) {
+        const { error } = await supabase
+            .from('rsvps')
+            .insert([{ name, attending }]);
+        
+        if (error) throw error;
+    } else {
+        // Fallback to localStorage
         const guests = JSON.parse(localStorage.getItem('iftar_guests') || '[]');
         guests.push({
             id: Date.now(),
@@ -110,25 +122,13 @@ async function saveRSVP(name, attending) {
             created_at: new Date().toISOString()
         });
         localStorage.setItem('iftar_guests', JSON.stringify(guests));
-        return;
     }
-    
-    // Use Supabase
-    const { error } = await supabase
-        .from('rsvps')
-        .insert([{ name, attending }]);
-    
-    if (error) throw error;
 }
 
 async function loadGuests() {
     let guests = [];
     
-    if (USE_LOCAL_STORAGE || !supabase) {
-        // Use localStorage
-        guests = JSON.parse(localStorage.getItem('iftar_guests') || '[]');
-    } else {
-        // Use Supabase
+    if (dbReady && supabase) {
         const { data, error } = await supabase
             .from('rsvps')
             .select('*')
@@ -139,31 +139,31 @@ async function loadGuests() {
             return;
         }
         guests = data || [];
+    } else {
+        guests = JSON.parse(localStorage.getItem('iftar_guests') || '[]');
     }
     
     renderGuests(guests);
 }
 
 function renderGuests(guests) {
+    if (!guestsContainer) return;
+    
     if (guests.length === 0) {
         guestsContainer.innerHTML = '<span class="no-guests">No responses yet</span>';
-        guestCount.textContent = '0 coming';
+        if (guestCount) guestCount.textContent = '0 coming';
         return;
     }
     
     const coming = guests.filter(g => g.attending);
     const notComing = guests.filter(g => !g.attending);
     
-    guestCount.textContent = `${coming.length} coming`;
+    if (guestCount) guestCount.textContent = `${coming.length} coming`;
     
     let html = '';
-    
-    // Show those coming first
     coming.forEach(guest => {
         html += `<span class="guest-chip coming">✓ ${escapeHtml(guest.name)}</span>`;
     });
-    
-    // Then those not coming
     notComing.forEach(guest => {
         html += `<span class="guest-chip not-coming">${escapeHtml(guest.name)}</span>`;
     });
@@ -176,3 +176,8 @@ function escapeHtml(text) {
     div.textContent = text;
     return div.innerHTML;
 }
+
+// Export for admin page
+window.loadGuests = loadGuests;
+window.supabaseClient = () => supabase;
+window.isDbReady = () => dbReady;

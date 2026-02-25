@@ -250,9 +250,22 @@
         <button class="export-btn" onclick="exportCSV()">📥 Export to CSV</button>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // Config - same as main app
-        const USE_LOCAL_STORAGE = true;
+        const SUPABASE_URL = 'https://your-project.supabase.co';
+        const SUPABASE_ANON_KEY = 'your-anon-key';
+        
+        let supabase = null;
+        let dbReady = false;
+        
+        // Initialize Supabase
+        if (typeof window.supabaseClient !== 'undefined') {
+            supabase = window.supabaseClient;
+        } else if (SUPABASE_URL !== 'https://your-project.supabase.co') {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            dbReady = true;
+        }
         
         // Admin password - change this!
         const ADMIN_PASSWORD = 'iftar2026';
@@ -279,10 +292,16 @@
             if (e.key === 'Enter') checkPassword();
         });
 
-        function loadResponses() {
+        async function loadResponses() {
             let guests = [];
             
-            if (USE_LOCAL_STORAGE) {
+            if (dbReady && supabase) {
+                const { data, error } = await supabase
+                    .from('rsvps')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                if (!error) guests = data || [];
+            } else {
                 guests = JSON.parse(localStorage.getItem('iftar_guests') || '[]');
             }
             
@@ -329,24 +348,38 @@
             container.innerHTML = html;
         }
         
-        function deleteGuest(id) {
+        async function deleteGuest(id) {
             if (!confirm('Remove this response?')) return;
             
-            let guests = JSON.parse(localStorage.getItem('iftar_guests') || '[]');
-            guests = guests.filter(g => g.id !== id);
-            localStorage.setItem('iftar_guests', JSON.stringify(guests));
+            if (dbReady && supabase) {
+                await supabase.from('rsvps').delete().eq('id', id);
+            } else {
+                let guests = JSON.parse(localStorage.getItem('iftar_guests') || '[]');
+                guests = guests.filter(g => g.id !== id);
+                localStorage.setItem('iftar_guests', JSON.stringify(guests));
+            }
             loadResponses();
         }
         
-        function clearAll() {
+        async function clearAll() {
             if (!confirm('Are you sure you want to clear ALL responses? This cannot be undone.')) return;
             
-            localStorage.removeItem('iftar_guests');
+            if (dbReady && supabase) {
+                await supabase.from('rsvps').delete().neq('id', 0);
+            } else {
+                localStorage.removeItem('iftar_guests');
+            }
             loadResponses();
         }
         
-        function exportCSV() {
-            const guests = JSON.parse(localStorage.getItem('iftar_guests') || '[]');
+        async function exportCSV() {
+            let guests = [];
+            if (dbReady && supabase) {
+                const { data } = await supabase.from('rsvps').select('*').order('created_at', { ascending: true });
+                guests = data || [];
+            } else {
+                guests = JSON.parse(localStorage.getItem('iftar_guests') || '[]');
+            }
             
             if (guests.length === 0) {
                 alert('No responses to export');

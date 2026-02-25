@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Iftar RSVP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+
+        .back-link {
+            color: #a0a0c0;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .back-link:hover {
+            color: #fff;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffd700;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #a0a0c0;
+            margin-top: 4px;
+        }
+
+        .stat-card.coming .stat-number {
+            color: #4ade80;
+        }
+
+        .stat-card.not-coming .stat-number {
+            color: #f87171;
+        }
+
+        .responses {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .responses-header {
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .responses-title {
+            font-weight: 600;
+        }
+
+        .clear-btn {
+            background: rgba(248, 113, 113, 0.2);
+            border: none;
+            color: #f87171;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.85rem;
+        }
+
+        .clear-btn:hover {
+            background: rgba(248, 113, 113, 0.3);
+        }
+
+        .response-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .response-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .response-item:last-child {
+            border-bottom: none;
+        }
+
+        .response-name {
+            font-weight: 500;
+        }
+
+        .response-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .response-status.coming {
+            background: rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+        }
+
+        .response-status.not-coming {
+            background: rgba(248, 113, 113, 0.15);
+            color: #f87171;
+        }
+
+        .response-time {
+            font-size: 0.8rem;
+            color: #606080;
+            margin-top: 4px;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #606080;
+            cursor: pointer;
+            padding: 4px 8px;
+            font-size: 1rem;
+        }
+
+        .delete-btn:hover {
+            color: #f87171;
+        }
+
+        .no-responses {
+            padding: 40px;
+            text-align: center;
+            color: #606080;
+        }
+
+        .export-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .export-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌙 Admin Panel</h1>
+            <a href="index.html" class="back-link">← Back to RSVP</a>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="total-count">0</div>
+                <div class="stat-label">Total Responses</div>
+            </div>
+            <div class="stat-card coming">
+                <div class="stat-number" id="coming-count">0</div>
+                <div class="stat-label">Coming</div>
+            </div>
+            <div class="stat-card not-coming">
+                <div class="stat-number" id="not-coming-count">0</div>
+                <div class="stat-label">Not Coming</div>
+            </div>
+        </div>
+
+        <div class="responses">
+            <div class="responses-header">
+                <span class="responses-title">All Responses</span>
+                <button class="clear-btn" onclick="clearAll()">Clear All</button>
+            </div>
+            <div class="response-list" id="response-list">
+                <div class="no-responses">No responses yet</div>
+            </div>
+        </div>
+
+        <button class="export-btn" onclick="exportCSV()">📥 Export to CSV</button>
+    </div>
+
+    <script>
+        // Config - same as main app
+        const USE_LOCAL_STORAGE = true;
+
+        function loadResponses() {
+            let guests = [];
+            
+            if (USE_LOCAL_STORAGE) {
+                guests = JSON.parse(localStorage.getItem('iftar_guests') || '[]');
+            }
+            
+            // Update stats
+            const coming = guests.filter(g => g.attending);
+            const notComing = guests.filter(g => !g.attending);
+            
+            document.getElementById('total-count').textContent = guests.length;
+            document.getElementById('coming-count').textContent = coming.length;
+            document.getElementById('not-coming-count').textContent = notComing.length;
+            
+            // Render list
+            const container = document.getElementById('response-list');
+            
+            if (guests.length === 0) {
+                container.innerHTML = '<div class="no-responses">No responses yet</div>';
+                return;
+            }
+            
+            // Sort by date, newest first
+            guests.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            
+            let html = '';
+            guests.forEach(guest => {
+                const date = new Date(guest.created_at);
+                const timeStr = date.toLocaleString();
+                
+                html += `
+                    <div class="response-item">
+                        <div>
+                            <div class="response-name">${escapeHtml(guest.name)}</div>
+                            <div class="response-time">${timeStr}</div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span class="response-status ${guest.attending ? 'coming' : 'not-coming'}">
+                                ${guest.attending ? '✓ Coming' : '✗ Not Coming'}
+                            </span>
+                            <button class="delete-btn" onclick="deleteGuest(${guest.id})">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function deleteGuest(id) {
+            if (!confirm('Remove this response?')) return;
+            
+            let guests = JSON.parse(localStorage.getItem('iftar_guests') || '[]');
+            guests = guests.filter(g => g.id !== id);
+            localStorage.setItem('iftar_guests', JSON.stringify(guests));
+            loadResponses();
+        }
+        
+        function clearAll() {
+            if (!confirm('Are you sure you want to clear ALL responses? This cannot be undone.')) return;
+            
+            localStorage.removeItem('iftar_guests');
+            loadResponses();
+        }
+        
+        function exportCSV() {
+            const guests = JSON.parse(localStorage.getItem('iftar_guests') || '[]');
+            
+            if (guests.length === 0) {
+                alert('No responses to export');
+                return;
+            }
+            
+            let csv = 'Name,Attending,Date\n';
+            guests.forEach(g => {
+                csv += `"${g.name}",${g.attending ? 'Yes' : 'No'},"${g.created_at}"\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'iftar_rsvp_responses.csv';
+            a.click();
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Load on page load
+        loadResponses();
+    </script>
+</body>
+</html>

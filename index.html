@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iftar 2026 🌙</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .moon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 10px #ffd700); }
+            to { filter: drop-shadow(0 0 20px #ffd700); }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #ffd700, #ffb347);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .date {
+            font-size: 1.3rem;
+            color: #a0a0c0;
+            font-weight: 300;
+        }
+
+        .details {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .detail-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-icon {
+            font-size: 1.3rem;
+        }
+
+        .detail-text {
+            color: #d0d0e0;
+        }
+
+        .form-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-title {
+            font-size: 1.2rem;
+            margin-bottom: 24px;
+            text-align: center;
+            color: #e0e0f0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #c0c0d0;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #ffd700;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        input[type="text"]::placeholder {
+            color: #606080;
+        }
+
+        .attendance-options {
+            display: flex;
+            gap: 12px;
+        }
+
+        .attendance-btn {
+            flex: 1;
+            padding: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #a0a0c0;
+            font-size: 1rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .attendance-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .attendance-btn.selected.yes {
+            border-color: #4ade80;
+            background: rgba(74, 222, 128, 0.15);
+            color: #4ade80;
+        }
+
+        .attendance-btn.selected.no {
+            border-color: #f87171;
+            background: rgba(248, 113, 113, 0.15);
+            color: #f87171;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(90deg, #ffd700, #ffb347);
+            color: #1a1a2e;
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .success-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .success-text {
+            font-size: 1.3rem;
+            color: #4ade80;
+            margin-bottom: 10px;
+        }
+
+        .success-subtext {
+            color: #a0a0c0;
+        }
+
+        .guest-list {
+            margin-top: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .guest-list-title {
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            color: #e0e0f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .guest-count {
+            background: rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .guests {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .guest-chip {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #d0d0e0;
+        }
+
+        .guest-chip.coming {
+            background: rgba(74, 222, 128, 0.15);
+            color: #4ade80;
+        }
+
+        .guest-chip.not-coming {
+            background: rgba(248, 113, 113, 0.1);
+            color: #f87171;
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        .no-guests {
+            color: #606080;
+            font-style: italic;
+        }
+
+        .admin-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .admin-link a {
+            color: #606080;
+            font-size: 0.85rem;
+            text-decoration: none;
+        }
+
+        .admin-link a:hover {
+            color: #a0a0c0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="moon">🌙</div>
+            <h1>Iftar Dinner</h1>
+            <div class="date">Sunday, March 8th, 2026</div>
+        </div>
+
+        <div class="details">
+            <div class="detail-item">
+                <span class="detail-icon">📅</span>
+                <span class="detail-text">Sunday, March 8th, 2026</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-icon">🕐</span>
+                <span class="detail-text">Iftar time (~6:30 PM)</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-icon">📍</span>
+                <span class="detail-text">Location TBD</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-icon">🍽️</span>
+                <span class="detail-text">Food will be provided</span>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <form id="rsvp-form">
+                <div class="form-title">Will you be joining us?</div>
+                
+                <div class="form-group">
+                    <label for="name">Your Name</label>
+                    <input type="text" id="name" name="name" placeholder="Enter your name" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Attendance</label>
+                    <div class="attendance-options">
+                        <button type="button" class="attendance-btn yes" data-value="yes">
+                            ✓ I'll be there
+                        </button>
+                        <button type="button" class="attendance-btn no" data-value="no">
+                            ✗ Can't make it
+                        </button>
+                    </div>
+                    <input type="hidden" id="attending" name="attending" required>
+                </div>
+
+                <button type="submit" class="submit-btn" disabled>Submit RSVP</button>
+            </form>
+
+            <div class="success-message" id="success">
+                <div class="success-icon">✨</div>
+                <div class="success-text">Thanks for responding!</div>
+                <div class="success-subtext">See you there insha'Allah 🤲</div>
+            </div>
+        </div>
+
+        <div class="guest-list" id="guest-list">
+            <div class="guest-list-title">
+                <span>👥 Guest List</span>
+                <span class="guest-count" id="guest-count">0 coming</span>
+            </div>
+            <div class="guests" id="guests">
+                <span class="no-guests">No responses yet</span>
+            </div>
+        </div>
+
+        <div class="admin-link">
+            <a href="admin.html">Admin View</a>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
